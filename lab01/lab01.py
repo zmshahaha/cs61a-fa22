@@ -56,11 +56,10 @@ def double_eights(n):
     """
     "*** YOUR CODE HERE ***"
     ret = False
-    digit = last_digit = 0
     while n > 0:
-        last_digit = digit
         digit = n%10
         n //= 10
-        if digit == 8 and last_digit == 8:
+        if digit == 8 and n%10 == 8:
             ret = True
     return ret
+    
