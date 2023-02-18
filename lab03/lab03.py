@@ -28,7 +28,13 @@ def ordered_digits(x):
     False
 
     """
-    "*** YOUR CODE HERE ***"
+    ret = True
+    while x > 0:
+        digit = x%10
+        x //= 10
+        if digit < x%10:
+            ret = False
+    return ret
 
 
 def get_k_run_starter(n, k):
@@ -50,15 +56,13 @@ def get_k_run_starter(n, k):
     >>> get_k_run_starter(1234234534564567, 2)
     2
     """
-    i = 0
-    final = None
-    while ____________________________:
-        while ____________________________:
-            ____________________________
-        final = ____________________________
-        i = ____________________________
-        n = ____________________________
-    return final
+    for i in range(0, k+1):
+        while n%10 > (n//10)%10 and n > 9:
+            n //= 10
+        if(i == k):
+            return n % 10
+        else:
+            n //= 10
 
 
 def make_repeater(func, n):
@@ -76,14 +80,17 @@ def make_repeater(func, n):
     >>> make_repeater(square, 0)(5) # Yes, it makes sense to apply the function zero times!
     5
     """
-    "*** YOUR CODE HERE ***"
+    def repeater(x):
+        times = n            # n is not in repeater's runtime, but times is assigned when make_repeater called 
+        for i in range(0, times):
+            x = func(x)
+        return x
+    return repeater
 
 
 def composer(func1, func2):
     """Return a function f, such that f(x) = func1(func2(x))."""
-    def f(x):
-        return func1(func2(x))
-    return f
+    return lambda x: func1(func2(x))
 
 
 def apply_twice(func):
@@ -94,7 +101,7 @@ def apply_twice(func):
     >>> apply_twice(square)(2)
     16
     """
-    "*** YOUR CODE HERE ***"
+    return make_repeater(func, 2)
 
 
 def div_by_primes_under(n):
@@ -109,12 +116,10 @@ def div_by_primes_under(n):
     False
     """
     checker = lambda x: False
-    i = ____________________________
-    while ____________________________:
-        if not checker(i):
-            checker = ____________________________
-        i = ____________________________
-    return ____________________________
+    for i in range(2, n+1):
+        if not checker(i):  # i is a prime_under_n, just check x%prime_under_n
+            checker = (lambda f, i: lambda x: f(x) or x%i == 0)(checker, i)
+    return checker
 
 
 def div_by_primes_under_no_lambda(n):
@@ -130,16 +135,16 @@ def div_by_primes_under_no_lambda(n):
     """
     def checker(x):
         return False
-    i = ____________________________
-    while ____________________________:
+        
+    for i in range(2, n+1):
         if not checker(i):
-            def outer(____________________________):
-                def inner(____________________________):
-                    return ____________________________
-                return ____________________________
-            checker = ____________________________
-        i = ____________________________
-    return ____________________________
+            def outer(f, i):
+                def inner(x):
+                    return f(x) or x%i == 0
+                return inner
+            checker = outer(checker, i)
+
+    return checker
 
 
 def zero(f):
@@ -151,13 +156,13 @@ def successor(n):
 
 
 def one(f):
-    """Church numeral 1: same as successor(zero)"""
-    "*** YOUR CODE HERE ***"
+    """Church numeral 1: same as successor(zero)(f)"""
+    return lambda x: f(x)
 
 
 def two(f):
-    """Church numeral 2: same as successor(successor(zero))"""
-    "*** YOUR CODE HERE ***"
+    """Church numeral 2: same as successor(successor(zero))(f)"""
+    return lambda x: f(f(x))
 
 
 three = successor(two)
@@ -175,16 +180,20 @@ def church_to_int(n):
     >>> church_to_int(three)
     3
     """
-    "*** YOUR CODE HERE ***"
+    return n(increment)(0)
 
 
 def add_church(m, n):
     """Return the Church numeral for m + n, for Church numerals m and n.
 
+    >>> church_to_int(add_church(three, three))
+    6
     >>> church_to_int(add_church(two, three))
     5
     """
-    "*** YOUR CODE HERE ***"
+    for i in range(0, church_to_int(n)):
+        m = successor(m)
+    return m
 
 
 def mul_church(m, n):
@@ -196,7 +205,7 @@ def mul_church(m, n):
     >>> church_to_int(mul_church(three, four))
     12
     """
-    "*** YOUR CODE HERE ***"
+    return composer(m, n)   # n's para is m(m_int times of func), n is n_int times m, so n is m_int*n_int times func
 
 
 def pow_church(m, n):
@@ -207,4 +216,4 @@ def pow_church(m, n):
     >>> church_to_int(pow_church(three, two))
     9
     """
-    "*** YOUR CODE HERE ***"
+    return make_repeater(m, church_to_int(n))
