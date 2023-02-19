@@ -15,6 +15,15 @@ def flatten(s):
     [[1, [1, 1]], 1, [1, 1]]
     """
     "*** YOUR CODE HERE ***"
+    ret = []
+    if type(s) != list:
+      return [s]
+    for i in s:
+      if type(i) == list:
+        ret += flatten(i)
+      else:
+        ret += [i]
+    return ret
 
 
 from math import sqrt
@@ -32,6 +41,7 @@ def distance(city_a, city_b):
     5.0
     """
     "*** YOUR CODE HERE ***"
+    return sqrt((get_lat(city_a)-get_lat(city_b))**2 + (get_lon(city_a)-get_lon(city_b))**2)
 
 
 def closer_city(lat, lon, city_a, city_b):
@@ -50,6 +60,10 @@ def closer_city(lat, lon, city_a, city_b):
     'Bucharest'
     """
     "*** YOUR CODE HERE ***"
+    city = make_city("city", lat, lon)
+    if(distance(city, city_a) < distance(city, city_b)):
+      return get_name(city_a)
+    return get_name(city_b)
 
 
 def check_city_abstraction():
@@ -151,6 +165,14 @@ def berry_finder(t):
     True
     """
     "*** YOUR CODE HERE ***"
+    if label(t) == 'berry':
+      return True
+    
+    sub_trees = branches(t)
+    for sub_tree in sub_trees:
+      if berry_finder(sub_tree) == True:
+        return True
+    return False
 
 
 def sprout_leaves(t, leaves):
@@ -187,6 +209,14 @@ def sprout_leaves(t, leaves):
           2
     """
     "*** YOUR CODE HERE ***"
+    if is_leaf(t):
+      t = tree(label(t), [tree(i) for i in leaves])
+    else:
+      branch = []
+      for subtree in branches(t):
+        branch += [sprout_leaves(subtree, leaves)]
+      t = tree(label(t), branch)
+    return t
 
 # Abstraction tests for sprout_leaves and berry_finder
 
@@ -250,6 +280,11 @@ def preorder(t):
     [2, 4, 6]
     """
     "*** YOUR CODE HERE ***"
+    ret = []
+    ret += [label(t)]
+    for subtree in branches(t):
+      ret += preorder(subtree)
+    return ret
 
 
 def add_trees(t1, t2):
@@ -288,6 +323,18 @@ def add_trees(t1, t2):
       5
     """
     "*** YOUR CODE HERE ***"
+    branch = []
+    len_branch = max(len(branches(t1)), len(branches(t2)))
+    for i in range(len_branch):
+      if i >= len(branches(t1)):
+        branch += [branches(t2)[i]]
+      elif i >= len(branches(t2)):
+        branch += [branches(t1)[i]]
+      else:
+        branch += [add_trees(branches(t1)[i], branches(t2)[i])]
+    if branch == []:
+      return tree(label(t1) + label(t2))
+    return tree(label(t1) + label(t2), branch)
 
 
 def change_abstraction(change):
