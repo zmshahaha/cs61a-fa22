@@ -24,7 +24,12 @@ def num_eights(pos):
     ...       ['Assign', 'AnnAssign', 'AugAssign', 'NamedExpr', 'For', 'While'])
     True
     """
-    "*** YOUR CODE HERE ***"
+    if pos == 8:
+        return 1
+    elif pos < 10:
+        return 0
+    else:
+        return num_eights(pos//10) + num_eights(pos%10)
 
 
 def pingpong(n):
@@ -60,7 +65,18 @@ def pingpong(n):
     ...       ['Assign', 'AnnAssign', 'AugAssign', 'NamedExpr'])
     True
     """
-    "*** YOUR CODE HERE ***"
+    # use a function to record direction
+    def direction(n):
+        if n == 1:
+            return 1
+        if num_eights(n-1) > 0 or (n-1)%8 == 0:
+            return -direction(n-1)
+        else:
+            return direction(n-1)
+
+    if n == 1:
+        return 1
+    return pingpong(n-1) + direction(n)
 
 
 def next_larger_coin(coin):
@@ -116,7 +132,16 @@ def count_coins(change):
     >>> check(HW_SOURCE_FILE, 'count_coins', ['While', 'For'])
     True
     """
-    "*** YOUR CODE HERE ***"
+    def count_coins_lessthan(change, coin):
+        if coin == None:
+            return 0
+        if change == 0: # make change successfully
+            return 1    # found a way to make change
+        if change < 0:
+            return 0
+        return count_coins_lessthan(change - coin, coin) + count_coins_lessthan(change, next_smaller_coin(coin))
+
+    return count_coins_lessthan(change, 25)
 
 
 anonymous = False  # Change to True if you would like to remain anonymous on the final leaderboard.
@@ -124,7 +149,8 @@ anonymous = False  # Change to True if you would like to remain anonymous on the
 
 def beaver(f):
     "*** YOUR CODE HERE ***"
-    __________________
+    # g(f) = f() or f() or f() or f(), g(g(f)) = f() for 4**2 times, call f() for 4**5=1024 times at all
+    (lambda g: g(g(g(g(g(f))))))(lambda f: lambda: f() or f() or f() or f())()
 
 
 def beaver_syntax_check():
